@@ -1,11 +1,20 @@
-
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import useCartStore from '../store/cartStore';
+import useCartStore, { CartItem as CartItemType } from '../store/cartStore';
 import { COLORS } from '../constants/colors';
-import { CartItem as CartItemType } from '../store/cartStore';
 
-const CartItem = ({ item }: { item: CartItemType }) => {
+type CartItemProps = {
+  item: CartItemType;
+};
+
+const formatINR = (amount: number) =>
+  new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 2,
+  }).format(amount);
+
+const CartItem = ({ item }: CartItemProps) => {
   const { increaseQty, decreaseQty, removeFromCart } = useCartStore();
 
   return (
@@ -20,7 +29,8 @@ const CartItem = ({ item }: { item: CartItemType }) => {
         <Text style={styles.title} numberOfLines={2}>
           {item.title}
         </Text>
-        <Text style={styles.price}>${item.price}</Text>
+
+        <Text style={styles.price}>{formatINR(item.price)}</Text>
 
         <View style={styles.qtyRow}>
           <TouchableOpacity
@@ -48,7 +58,7 @@ const CartItem = ({ item }: { item: CartItemType }) => {
         </View>
 
         <Text style={styles.subtotal}>
-          Subtotal: ${(item.price * item.quantity).toFixed(2)}
+          Subtotal: {formatINR(item.price * item.quantity)}
         </Text>
       </View>
     </View>

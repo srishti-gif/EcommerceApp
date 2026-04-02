@@ -19,7 +19,7 @@ const CartScreen = () => {
   const handleCheckout = () => {
     Alert.alert(
       '🎉 Order Placed!',
-      `Total: $${getTotalAmount()} \n\nThank you for shopping with us!`,
+      `Total: ₹${getTotalAmount()} \n\nThank you for shopping with us!`,
       [{ text: 'OK', onPress: () => clearCart() }],
     );
   };
@@ -48,7 +48,7 @@ const CartScreen = () => {
       <View style={styles.footer}>
         <View style={styles.totalRow}>
           <Text style={styles.totalLabel}>Total Amount</Text>
-          <Text style={styles.totalAmount}>${getTotalAmount()}</Text>
+          <Text style={styles.totalAmount}>₹{getTotalAmount()}</Text>
         </View>
 
         <TouchableOpacity style={styles.checkoutBtn} onPress={handleCheckout}>

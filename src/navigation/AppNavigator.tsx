@@ -23,13 +23,18 @@ const AppNavigator = () => {
         <Stack.Screen
           name="ProductList"
           component={ProductListScreen}
-          options={{ title: '🛍️ Products' }}
+           options={{ title: '🛍️ Products' }}
         />
         <Stack.Screen
           name="Cart"
           component={CartScreen}
           options={{ title: '🛒 My Cart' }}
+
         />
+         
+
+
+
       </Stack.Navigator>
     </NavigationContainer>
   );

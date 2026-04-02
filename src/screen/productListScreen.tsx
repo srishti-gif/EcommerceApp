@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -7,33 +6,40 @@ import {
   Text,
   StyleSheet,
 } from 'react-native';
-import { getAllProducts } from '../api/apis';
+import { getAllProducts, Product } from '../api/apis';
 import ProductCard from '../components/productCard';
 import FloatingCartButton from '../components/FloatingCartButton';
 import { COLORS } from '../constants/colors';
-import { Product } from '../store/cartStore';
 
-const ProductListScreen = ({ navigation }: { navigation: any }) => {
+type ProductListScreenProps = {
+  navigation: {
+    navigate: (screen: string) => void;
+  };
+};
+
+const ProductListScreen: React.FC<ProductListScreenProps> = ({
+  navigation,
+}) => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-
   useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getAllProducts();
+        setProducts(data);
+      } catch (err) {
+        setError('Cannot load products. Please retry.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchProducts();
   }, []);
-
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      const data = await getAllProducts();
-      setProducts(data);
-    } catch (err) {
-      setError('Cannot load Products. Please retry.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -56,8 +62,10 @@ const ProductListScreen = ({ navigation }: { navigation: any }) => {
     <View style={styles.container}>
       <FlatList
         data={products}
-        keyExtractor={item => item.id.toString()}
+        // string khud bana lo
+        keyExtractor={item => String(item.id)}
         numColumns={2}
+        //useCallback mai rkhna hai
         renderItem={({ item }) => <ProductCard product={item} />}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
@@ -75,7 +83,7 @@ const styles = StyleSheet.create({
   },
   list: {
     padding: 8,
-    paddingBottom: 100, 
+    paddingBottom: 100, // floating button ke liye space
   },
   centered: {
     flex: 1,

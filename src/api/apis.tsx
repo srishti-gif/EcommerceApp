@@ -12,30 +12,38 @@
 //     throw error;
 //   }
 // };
-const BASE_URL = 'https://fake-store-api.mock.beeceptor.com/api';
+const BASE_URL = 'https://dummyjson.com';
 
-export type ApiReview = {
-  user_id: number;
+export type DummyReview = {
   rating: number;
   comment: string;
+  date: string;
+  reviewerName: string;
+  reviewerEmail: string;
 };
 
-export type ApiProduct = {
-  product_id: number;
-  name: string;
+export type DummyProduct = {
+  id: number;
+  title: string;
   description: string;
   price: number;
-  unit: string;
-  image: string;
-  discount: number;
-  availability: boolean;
-  brand: string;
   category: string;
-  rating: number; 
-  reviews: ApiReview[];
+  brand?: string;
+  rating: number;
+  stock: number;
+  images?: string[];
+  thumbnail?: string;
+  reviews?: DummyReview[];
 };
 
+type DummyProductsResponse = {
+  products: DummyProduct[];
+  total: number;
+  skip: number;
+  limit: number;
+};
 
+// Your app model
 export type Product = {
   id: number;
   title: string;
@@ -49,16 +57,16 @@ export type Product = {
   };
 };
 
-const mapApiProductToProduct = (p: ApiProduct): Product => ({
-  id: p.product_id,
-  title: p.name,
+const mapDummyToProduct = (p: DummyProduct): Product => ({
+  id: p.id,
+  title: p.title,
   description: p.description,
   price: p.price,
-  image: p.image,
+  image: p.thumbnail || p.images?.[0] || '',
   category: p.category,
   rating: {
     rate: p.rating,
-    count: p.reviews?.length ?? 0,
+    count: p.reviews?.length ?? 0, // or p.stock if you prefer
   },
 });
 
@@ -67,8 +75,11 @@ export const getAllProducts = async (): Promise<Product[]> => {
   if (!response.ok)
     throw new Error(`Failed to fetch products: ${response.status}`);
 
-  const data: unknown = await response.json();
-  if (!Array.isArray(data)) throw new Error('Invalid API response format');
+  const data: DummyProductsResponse = await response.json();
 
-  return (data as ApiProduct[]).map(mapApiProductToProduct);
+  if (!Array.isArray(data.products)) {
+    throw new Error('Invalid API response format: products[] missing');
+  }
+
+  return data.products.map(mapDummyToProduct);
 };

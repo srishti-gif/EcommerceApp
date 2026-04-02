@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import useCartStore, { Product } from '../store/cartStore';
@@ -9,9 +8,18 @@ type ProductCardProps = {
 };
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const { cartItems, addToCart } = useCartStore();
+  const { cartItems, addToCart, removeFromCart } = useCartStore();
 
   const isAdded = cartItems.some(item => item.id === product.id);
+
+  const handleCartAction = () => {
+    if (isAdded) {
+      removeFromCart(product.id);
+      return;
+    }
+
+    addToCart(product);
+  };
 
   return (
     <View style={styles.card}>
@@ -29,21 +37,18 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
         <View style={styles.ratingRow}>
           <Text style={styles.rating}>⭐ {product.rating?.rate ?? 'N/A'}</Text>
-          <Text style={styles.ratingCount}>
-            ({product.rating?.count ?? 0})
-          </Text>
+          <Text style={styles.ratingCount}>({product.rating?.count ?? 0})</Text>
         </View>
 
-        <Text style={styles.price}>${product.price}</Text>
+        <Text style={styles.price}>₹{product.price}</Text>
       </View>
 
       <TouchableOpacity
-        style={[styles.addBtn, isAdded && styles.addedBtn]}
-        onPress={() => addToCart(product)}
-        disabled={isAdded}
+        style={[styles.cartBtn, isAdded ? styles.removeBtn : styles.addBtn]}
+        onPress={handleCartAction}
       >
-        <Text style={styles.addBtnText}>
-          {isAdded ? '✓ Added' : 'Add to Cart'}
+        <Text style={styles.cartBtnText}>
+          {isAdded ? 'Remove' : 'Add to Cart'}
         </Text>
       </TouchableOpacity>
     </View>
@@ -104,16 +109,18 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     marginBottom: 8,
   },
-  addBtn: {
-    backgroundColor: COLORS.primary,
+  cartBtn: {
     borderRadius: 8,
     paddingVertical: 8,
     alignItems: 'center',
   },
-  addedBtn: {
-    backgroundColor: COLORS.success,
+  addBtn: {
+    backgroundColor: COLORS.primary,
   },
-  addBtnText: {
+  removeBtn: {
+    backgroundColor: '#dc2626',
+  },
+  cartBtnText: {
     color: COLORS.white,
     fontWeight: '600',
     fontSize: 13,
